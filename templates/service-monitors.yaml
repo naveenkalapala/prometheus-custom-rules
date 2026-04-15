@@ -1,0 +1,25 @@
+{{- range .Values.serviceMonitorFiles }}
+{{- $fileContent := $.Files.Get . }}
+{{- if $fileContent }}
+{{- $smConfig := $fileContent | fromYaml }}
+{{- $smName := . | base | trimSuffix ".yaml" | trimSuffix ".yml" | replace "_" "-" }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ $smName }}
+  namespace: {{ $smConfig.namespace | default $.Release.Namespace }}
+  labels:
+    release: {{ $.Release.Name }}
+    {{- include "monitoring-stack.labels" $ | nindent 4 }}
+spec:
+  selector:
+{{ $smConfig.selector | toYaml | indent 4 }}
+  {{- if $smConfig.namespaceSelector }}
+  namespaceSelector:
+{{ $smConfig.namespaceSelector | toYaml | indent 4 }}
+  {{- end }}
+  endpoints:
+{{ $smConfig.endpoints | toYaml | indent 4 }}
+{{- end }}
+{{- end }}

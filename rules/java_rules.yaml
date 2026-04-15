@@ -1,0 +1,11 @@
+groups:
+  - name: java-app-alerts
+    rules:
+      - alert: JavaHeapUsageHigh
+        expr: jvm_memory_used_bytes{area="heap"} / jvm_memory_max_bytes{area="heap"} > 0.8
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Java heap usage is high"
+          description: "The Java application heap usage has exceeded 80% for the last 5 minutes."

@@ -1,0 +1,4 @@
+interval: 30s
+module: http_2xx
+targets:
+  - http://monitoring-grafana.monitoring.svc.cluster.local/login

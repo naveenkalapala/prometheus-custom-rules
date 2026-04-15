@@ -1,0 +1,42 @@
+# Rule files to load as PrometheusRule CRDs
+additionalPrometheusRulesTemplates:
+  - 'rules/java_rules.yaml'
+
+# Blackbox Exporter probes
+blackboxExporter:
+  prober: blackbox-prometheus-blackbox-exporter:9115
+  probeFiles:
+    - 'probes/grafana_probe.yaml'
+
+# ServiceMonitor files to load
+serviceMonitorFiles:
+  - 'servicemonitor/java.yaml'
+
+# kube-prometheus-stack subchart overrides
+kube-prometheus-stack:
+
+  # Grafana configuration
+  grafana:
+    enabled: true
+    admin:
+      existingSecret: grafana-secrets
+      userKey: admin_username
+      passwordKey: admin_password
+
+  # Disable default Prometheus rules
+  defaultRules:
+    create: false
+
+  prometheusOperator:
+    env:
+      GOGC: "30"
+
+  # Prometheus — retention and WAL compression
+  prometheus:
+    prometheusSpec:
+      retention: 10d
+      walCompression: true
+
+
+
+

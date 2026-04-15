@@ -1,0 +1,27 @@
+{{- range .Values.blackboxExporter.probeFiles }}
+{{- $fileContent := $.Files.Get . }}
+{{- if $fileContent }}
+{{- $probeConfig := $fileContent | fromYaml }}
+{{- $probeName := . | base | trimSuffix ".yaml" | trimSuffix ".yml" | replace "_" "-" }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: Probe
+metadata:
+  name: {{ $probeName }}
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    release: {{ $.Release.Name }}
+    {{- include "monitoring-stack.labels" $ | nindent 4 }}
+spec:
+  interval: {{ $probeConfig.interval | default "30s" }}
+  module: {{ $probeConfig.module | default "http_2xx" }}
+  prober:
+    url: {{ $.Values.blackboxExporter.prober }}
+  targets:
+    staticConfig:
+      static:
+        {{- range $probeConfig.targets }}
+        - {{ . }}
+        {{- end }}
+{{- end }}
+{{- end }}

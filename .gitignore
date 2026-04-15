@@ -1,0 +1,10 @@
+# Secrets
+
+# Helm dependency charts
+charts/*.tgz
+
+# Helm lock file
+Chart.lock
+
+# macOS
+.DS_Store

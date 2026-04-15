@@ -1,0 +1,18 @@
+{{- range .Values.additionalPrometheusRulesTemplates }}
+{{- $fileContent := $.Files.Get . }}
+{{- if $fileContent }}
+{{- $ruleName := . | base | trimSuffix ".yaml" | trimSuffix ".yml" | replace "_" "-" }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ $ruleName }}
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    app: kube-prometheus-stack
+    release: {{ $.Release.Name }}
+    {{- include "monitoring-stack.labels" $ | nindent 4 }}
+spec:
+{{ $fileContent | indent 2 }}
+{{- end }}
+{{- end }}
